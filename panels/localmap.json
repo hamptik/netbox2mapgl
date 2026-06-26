@@ -1,0 +1,408 @@
+{
+  "id": null,
+  "type": "vaduga-mapgl-panel",
+  "title": "Local Network Map",
+  "gridPos": {
+    "x": 0,
+    "y": 0,
+    "h": 17,
+    "w": 11
+  },
+  "fieldConfig": {
+    "defaults": {
+      "custom": {
+        "hideFrom": {
+          "tooltip": false,
+          "viz": false,
+          "legend": false
+        }
+      },
+      "mappings": [],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "dark-purple",
+            "value": null
+          }
+        ]
+      },
+      "color": {
+        "mode": "thresholds"
+      },
+      "links": [
+        {
+          "targetBlank": false,
+          "title": "Go to device",
+          "url": "/d/${DEVICE_DASHBOARD_UID}?var-instance=${__data.fields.instance}"
+        }
+      ]
+    },
+    "overrides": [
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "val"
+        },
+        "properties": [
+          {
+            "id": "thresholds",
+            "value": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "#5f5f5f",
+                  "value": null
+                },
+                {
+                  "color": "dark-red",
+                  "value": 0
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 0.9
+                },
+                {
+                  "color": "#37872D",
+                  "value": 1
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "transformations": [
+    {
+      "id": "convertFieldType",
+      "options": {
+        "conversions": [
+          {
+            "destinationType": "number",
+            "targetField": "Value"
+          }
+        ],
+        "fields": {}
+      }
+    },
+    {
+      "id": "joinByField",
+      "options": {
+        "byField": "instance",
+        "mode": "outerTabular"
+      }
+    },
+    {
+      "id": "filterByValue",
+      "options": {
+        "filters": [
+          {
+            "config": {
+              "id": "isNull",
+              "options": {}
+            },
+            "fieldName": "Location A"
+          }
+        ],
+        "match": "any",
+        "type": "exclude"
+      }
+    },
+    {
+      "id": "calculateField",
+      "options": {
+        "alias": "val",
+        "binary": {
+          "left": {
+            "matcher": {
+              "id": "byName",
+              "options": "Value"
+            }
+          },
+          "operator": "*",
+          "right": {
+            "fixed": "1"
+          }
+        },
+        "mode": "binary",
+        "reduce": {
+          "reducer": "sum"
+        }
+      }
+    }
+  ],
+  "pluginVersion": "2.6.1",
+  "targets": [
+    {
+      "columns": [],
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
+      },
+      "filters": [],
+      "format": "table",
+      "global_query_id": "",
+      "parser": "backend",
+      "refId": "A",
+      "root_selector": "",
+      "source": "url",
+      "type": "json",
+      "url": "/paths?location=${location}",
+      "url_options": {
+        "data": "",
+        "method": "GET"
+      }
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editorMode": "code",
+      "exemplar": false,
+      "expr": "sum by(instance) (\r\n  up{job=~\".*snmp.*\"}\r\n  or\r\n  probe_success{job!~\".*snmp.*\"}\r\n) \r\n/ \r\ncount by(instance) (\r\n  up{job=~\".*snmp.*\"}\r\n  or\r\n  probe_success{job!~\".*snmp.*\"}\r\n)",
+      "format": "table",
+      "instant": true,
+      "legendFormat": "test1",
+      "range": false,
+      "refId": "B"
+    }
+  ],
+  "datasource": {
+    "type": "datasource",
+    "uid": "-- Mixed --"
+  },
+  "options": {
+    "view": {
+      "allLayers": true,
+      "id": "coords",
+      "lat": 0,
+      "lon": 0,
+      "zoom": 1
+    },
+    "common": {
+      "isShowSwitcher": true,
+      "isShowEdgeLegend": false,
+      "isShowLegend": true,
+      "isMeters": false,
+      "edgeRouting": "Splines",
+      "isAppAuth": false,
+      "jitterPoints": false
+    },
+    "basemap": {
+      "config": {},
+      "name": "Layer 0",
+      "type": "blank"
+    },
+    "dataLayers": [
+      {
+        "config": {
+          "arcConfig": {
+            "capacity": {
+              "fixed": 1
+            },
+            "height": 0.5,
+            "tiltIncrement": 7
+          },
+          "arcStyle": {
+            "sideA": {
+              "arrow": 1,
+              "color": {
+                "fixed": "dark-red"
+              },
+              "opacity": 0.4,
+              "size": {
+                "fixed": 5,
+                "max": 15,
+                "min": 2
+              },
+              "textConfig": {
+                "fontSize": 14
+              }
+            },
+            "sideB": {
+              "arrow": -1,
+              "color": {
+                "fixed": "dark-red"
+              },
+              "opacity": 0.4,
+              "size": {
+                "field": "Value",
+                "fixed": 5,
+                "max": 15,
+                "min": 2
+              },
+              "textConfig": {
+                "fontSize": 14
+              }
+            }
+          },
+          "edgeStyle": {
+            "color": {
+              "field": "val",
+              "fixed": "super-light-blue"
+            },
+            "opacity": 0.4,
+            "size": {
+              "fixed": 5,
+              "max": 15,
+              "min": 2
+            },
+            "text": {
+              "fixed": "",
+              "mode": "fixed"
+            },
+            "textConfig": {
+              "fontSize": 14
+            }
+          },
+          "groups": [
+            {
+              "collapse": true,
+              "color": "#4ec7ff",
+              "iconName": "cisco/standard-host",
+              "iconSize": 75,
+              "iconVOffset": 0,
+              "label": "Up",
+              "nodeSize": 5,
+              "overrides": [
+                {
+                  "name": "thrColor",
+                  "type": "enum",
+                  "value": [
+                    "dark-green"
+                  ]
+                }
+              ]
+            },
+            {
+              "collapse": true,
+              "color": "#E0B400",
+              "iconName": "databases/google-firebase",
+              "iconSize": 75,
+              "iconVOffset": 0,
+              "label": "Down",
+              "nodeSize": 60,
+              "overrides": [
+                {
+                  "name": "thrColor",
+                  "type": "enum",
+                  "value": [
+                    "dark-red",
+                    "#EAB839"
+                  ]
+                }
+              ]
+            },
+            {
+              "collapse": true,
+              "color": "#505050",
+              "iconName": "networking/lock",
+              "iconSize": 100,
+              "iconVOffset": 2,
+              "label": "No monitoring",
+              "nodeSize": 5,
+              "overrides": [
+                {
+                  "name": "val",
+                  "type": "number",
+                  "value": "NaN"
+                }
+              ]
+            },
+            {
+              "collapse": true,
+              "color": "#ccccdc",
+              "iconName": "networking/mainframe",
+              "iconSize": 130,
+              "iconVOffset": 0,
+              "label": "Main Device Up",
+              "nodeSize": 5,
+              "overrides": [
+                {
+                  "name": "edgeId",
+                  "type": "string",
+                  "value": "-1"
+                },
+                {
+                  "name": "thrColor",
+                  "type": "enum",
+                  "value": [
+                    "dark-green"
+                  ]
+                }
+              ]
+            },
+            {
+              "collapse": true,
+              "color": "#E0B400",
+              "iconName": "databases/google-firebase",
+              "iconSize": 20,
+              "iconVOffset": 0,
+              "label": "Main Device Down",
+              "nodeSize": 5,
+              "overrides": [
+                {
+                  "name": "edgeId",
+                  "type": "string",
+                  "value": "-1"
+                },
+                {
+                  "name": "thrColor",
+                  "type": "enum",
+                  "value": [
+                    "dark-red"
+                  ]
+                }
+              ]
+            }
+          ],
+          "showStat2": false,
+          "style": {
+            "arcs": [],
+            "arrow": 0,
+            "color": {
+              "field": "val",
+              "fixed": "blue"
+            },
+            "opacity": 0.4,
+            "size": {
+              "fixed": 80,
+              "max": 200,
+              "min": 100
+            },
+            "text": {
+              "field": "instance",
+              "fixed": "",
+              "mode": "field"
+            },
+            "textConfig": {
+              "fontSize": 15
+            },
+            "useGroups": true
+          }
+        },
+        "displayProperties": [
+          "VertexB"
+        ],
+        "edgeIdField": "edgeId",
+        "isShowTooltip": true,
+        "isWrapEdges": 1,
+        "locField": "instance",
+        "location": {
+          "mode": "auto"
+        },
+        "name": "new markers layer",
+        "parField": "VertexB",
+        "query": {
+          "id": "byRefId",
+          "options": "joinByField-A-B"
+        },
+        "type": "markers"
+      }
+    ],
+    "isEditable": false,
+    "updatesLog": false
+  }
+}

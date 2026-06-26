@@ -1,0 +1,636 @@
+{
+  "id": null,
+  "type": "vaduga-mapgl-panel",
+  "title": "Geographic Network Map",
+  "gridPos": {
+    "x": 0,
+    "y": 0,
+    "h": 14,
+    "w": 20
+  },
+  "fieldConfig": {
+    "defaults": {
+      "custom": {
+        "hideFrom": {
+          "tooltip": false,
+          "viz": false,
+          "legend": false
+        }
+      },
+      "mappings": [],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "#2a2e34",
+            "value": null
+          }
+        ]
+      },
+      "color": {
+        "mode": "thresholds"
+      },
+      "decimals": 1,
+      "fieldMinMax": true,
+      "links": [
+        {
+          "title": "Open location map",
+          "url": "/d/${LOCAL_MAP_UID}/local-map?var-location=${__data.fields.vertexA (lastNotNull)}"
+        }
+      ]
+    },
+    "overrides": [
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "capacity (lastNotNull)"
+        },
+        "properties": [
+          {
+            "id": "unit",
+            "value": "binbps"
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "Value #B (lastNotNull)"
+        },
+        "properties": [
+          {
+            "id": "unit",
+            "value": "binbps"
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "Value #D (lastNotNull)"
+        },
+        "properties": [
+          {
+            "id": "unit",
+            "value": "binbps"
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "in"
+        },
+        "properties": [
+          {
+            "id": "max",
+            "value": 1
+          },
+          {
+            "id": "min",
+            "value": 0
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "out"
+        },
+        "properties": [
+          {
+            "id": "min",
+            "value": 0
+          },
+          {
+            "id": "max",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "Value #C (lastNotNull)"
+        },
+        "properties": [
+          {
+            "id": "thresholds",
+            "value": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "dark-red",
+                  "value": null
+                },
+                {
+                  "color": "blue",
+                  "value": 1
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "in"
+        },
+        "properties": [
+          {
+            "id": "thresholds",
+            "value": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "dark-red",
+                  "value": null
+                },
+                {
+                  "color": "blue",
+                  "value": 1e-40
+                },
+                {
+                  "color": "dark-yellow",
+                  "value": 0.1
+                },
+                {
+                  "color": "dark-orange",
+                  "value": 0.5
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "out"
+        },
+        "properties": [
+          {
+            "id": "thresholds",
+            "value": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "dark-red",
+                  "value": null
+                },
+                {
+                  "color": "blue",
+                  "value": 1e-40
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 0.1
+                },
+                {
+                  "color": "dark-orange",
+                  "value": 0.5
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "transformations": [
+    {
+      "id": "joinByField",
+      "options": {
+        "byField": "mapgl_node_ifc_name",
+        "mode": "outerTabular"
+      }
+    },
+    {
+      "id": "groupBy",
+      "options": {
+        "fields": {
+          "Value #B": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "Value #C": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "Value #D": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "capacity": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "capacity A": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "edgeId": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "instance": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "lat": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "lat A": {
+            "aggregations": [],
+            "operation": "groupby"
+          },
+          "lon": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "lon A": {
+            "aggregations": [],
+            "operation": "groupby"
+          },
+          "mapgl_node_ifc_name": {
+            "aggregations": [],
+            "operation": "groupby"
+          },
+          "remote_instance": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "remote_instance A": {
+            "aggregations": [],
+            "operation": "groupby"
+          },
+          "vertexA": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "vertexA A": {
+            "aggregations": [],
+            "operation": "groupby"
+          },
+          "vertexB": {
+            "aggregations": [
+              "lastNotNull"
+            ],
+            "operation": "aggregate"
+          },
+          "vertexB A": {
+            "aggregations": [],
+            "operation": "groupby"
+          }
+        }
+      }
+    },
+    {
+      "id": "filterByValue",
+      "options": {
+        "filters": [
+          {
+            "config": {
+              "id": "isNull",
+              "options": {}
+            },
+            "fieldName": "lat"
+          }
+        ],
+        "match": "any",
+        "type": "exclude"
+      }
+    },
+    {
+      "id": "calculateField",
+      "options": {
+        "alias": "in",
+        "binary": {
+          "left": {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #B (lastNotNull)"
+            }
+          },
+          "operator": "/",
+          "right": {
+            "matcher": {
+              "id": "byName",
+              "options": "capacity A (lastNotNull)"
+            }
+          }
+        },
+        "mode": "binary",
+        "reduce": {
+          "reducer": "sum"
+        }
+      }
+    },
+    {
+      "id": "calculateField",
+      "options": {
+        "alias": "out",
+        "binary": {
+          "left": {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #D (lastNotNull)"
+            }
+          },
+          "operator": "/",
+          "right": {
+            "matcher": {
+              "id": "byName",
+              "options": "capacity A (lastNotNull)"
+            }
+          }
+        },
+        "mode": "binary",
+        "reduce": {
+          "reducer": "sum"
+        }
+      }
+    },
+    {
+      "id": "organize",
+      "options": {
+        "excludeByName": {},
+        "includeByName": {},
+        "indexByName": {},
+        "renameByName": {
+          "Value #B (lastNotNull)": "Incoming traffic",
+          "Value #D (lastNotNull)": "Outgoing traffic",
+          "remote_instance (lastNotNull)": "Remote location"
+        }
+      }
+    }
+  ],
+  "pluginVersion": "2.6.1",
+  "targets": [
+    {
+      "columns": [],
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
+      },
+      "filters": [],
+      "format": "table",
+      "global_query_id": "",
+      "parser": "backend",
+      "refId": "A",
+      "root_selector": "",
+      "source": "url",
+      "type": "json",
+      "url": "/links",
+      "url_options": {
+        "data": "",
+        "method": "GET"
+      }
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editorMode": "code",
+      "exemplar": false,
+      "expr": "rate(ifHCInOctets{job=~\".*network.*\"}[11m]) \r\n* on(ifIndex, instance, job) \r\ngroup_left(ifDescr, mapgl_node_ifc_name) \r\nlabel_join(ifDescr{job=~\".*network.*\"}, \"mapgl_node_ifc_name\", \"@\", \"ifDescr\", \"instance\")",
+      "format": "table",
+      "instant": true,
+      "legendFormat": "Incoming",
+      "range": false,
+      "refId": "B"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editorMode": "code",
+      "exemplar": false,
+      "expr": "rate(ifHCOutOctets{job=~\".*network.*\"}[11m]) \r\n* on(ifIndex, instance, job) \r\ngroup_left(ifDescr, mapgl_node_ifc_name) \r\nlabel_join(ifDescr{job=~\".*network.*\"}, \"mapgl_node_ifc_name\", \"@\", \"ifDescr\", \"instance\")",
+      "format": "table",
+      "instant": true,
+      "legendFormat": "Outgoing",
+      "range": false,
+      "refId": "D"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editorMode": "code",
+      "exemplar": false,
+      "expr": "label_join(\r\n  (\r\n    group by(instance, ifDescr) (ifDescr)\r\n      * on(instance) group_left\r\n    max by(instance) (probe_success)\r\n  ),\r\n  \"mapgl_node_ifc_name\", \"@\", \"ifDescr\", \"instance\"\r\n)\r\n",
+      "format": "table",
+      "instant": true,
+      "legendFormat": "__auto",
+      "range": false,
+      "refId": "C"
+    }
+  ],
+  "datasource": {
+    "type": "datasource",
+    "uid": "-- Mixed --"
+  },
+  "options": {
+    "view": {
+      "allLayers": true,
+      "id": "coords",
+      "lat": 0,
+      "lon": 0,
+      "zoom": 1
+    },
+    "common": {
+      "isShowSwitcher": true,
+      "isShowEdgeLegend": false,
+      "isShowLegend": true,
+      "isMeters": false,
+      "edgeRouting": "Splines",
+      "isAppAuth": false,
+      "jitterPoints": false
+    },
+    "basemap": {
+      "config": {
+        "showLabels": true,
+        "theme": "auto"
+      },
+      "name": "Layer 0",
+      "type": "osm-standard"
+    },
+    "dataLayers": [
+      {
+        "config": {
+          "arcConfig": {
+            "capacity": {
+              "fixed": 1
+            },
+            "height": 0.5,
+            "tiltIncrement": 7
+          },
+          "arcStyle": {
+            "sideA": {
+              "arrow": 1,
+              "color": {
+                "field": "in",
+                "fixed": "dark-green"
+              },
+              "opacity": 0.4,
+              "size": {
+                "fixed": 2,
+                "max": 15,
+                "min": 2
+              },
+              "textConfig": {
+                "fontSize": 14
+              }
+            },
+            "sideB": {
+              "arrow": 1,
+              "color": {
+                "field": "out",
+                "fixed": "dark-green"
+              },
+              "opacity": 0.4,
+              "size": {
+                "fixed": 2,
+                "max": 2,
+                "min": 1
+              },
+              "textConfig": {
+                "fontSize": 14
+              }
+            }
+          },
+          "edgeStyle": {
+            "color": {
+              "fixed": "#919191"
+            },
+            "opacity": 0.7,
+            "size": {
+              "fixed": 3,
+              "max": 15,
+              "min": 2
+            },
+            "text": {
+              "fixed": "",
+              "mode": "field"
+            },
+            "textConfig": {
+              "fontSize": 14
+            }
+          },
+          "groups": [
+            {
+              "collapse": true,
+              "color": "#1F60C4",
+              "iconName": "cisco/branch-office",
+              "iconSize": 20,
+              "iconVOffset": -5,
+              "label": "Up",
+              "overrides": [
+                {
+                  "name": "thrColor",
+                  "type": "enum",
+                  "value": [
+                    "blue"
+                  ]
+                }
+              ]
+            },
+            {
+              "collapse": true,
+              "color": "#C4162A",
+              "iconName": "databases/google-firebase",
+              "iconSize": 20,
+              "iconVOffset": -5,
+              "label": "Down",
+              "overrides": [
+                {
+                  "name": "thrColor",
+                  "type": "enum",
+                  "value": [
+                    "dark-red"
+                  ]
+                }
+              ]
+            }
+          ],
+          "showStat2": true,
+          "style": {
+            "arrow": 0,
+            "color": {
+              "field": "Value #C (lastNotNull)",
+              "fixed": "#3c3c3c"
+            },
+            "opacity": 0.8,
+            "size": {
+              "fixed": 15,
+              "max": 15,
+              "min": 2
+            },
+            "text": {
+              "field": "vertexA",
+              "fixed": "",
+              "mode": "field"
+            },
+            "textConfig": {
+              "fontSize": 14
+            },
+            "useGroups": true
+          }
+        },
+        "displayProperties": [
+          "mapgl_node_ifc_name",
+          "Value #B (lastNotNull)",
+          "Value #D (lastNotNull)",
+          "remote_instance (lastNotNull)"
+        ],
+        "edgeIdField": "mapgl_node_ifc_name",
+        "isShowTooltip": true,
+        "isWrapEdges": 3,
+        "locField": "vertexA",
+        "location": {
+          "latitude": "lat",
+          "longitude": "lon",
+          "mode": "coords"
+        },
+        "name": "new markers layer",
+        "parField": "vertexB",
+        "query": {
+          "id": "byRefId",
+          "options": "joinByField-A-B-D-C"
+        },
+        "searchProperties": [],
+        "type": "markers"
+      }
+    ],
+    "isEditable": false,
+    "updatesLog": false
+  }
+}

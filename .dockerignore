@@ -32,6 +32,9 @@ tests/
 
 # Project files not needed in image
 README.md
+NETBOX_SETUP.md
+GRAFANA_SETUP.md
+panels/
 docker-compose*.yml
 .env
 .env.*
