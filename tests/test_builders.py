@@ -150,6 +150,27 @@ class TestBuildLinks:
         assert markers[0]["lon"] == 59.9
         assert markers[0]["lat"] == 30.5
 
+    def test_custom_target_roles(self) -> None:
+        snapshot = CacheSnapshot(
+            devices={
+                1: _device(1, "fw-a", role="firewall", location_slug="dc1", location_id=100),
+                2: _device(2, "fw-b", role="firewall", location_slug="dc2", location_id=200),
+            },
+            locations={
+                100: _location(100, "dc1", "30.5", "59.9"),
+                200: _location(200, "dc2", "31.0", "60.0"),
+            },
+            cables={},
+            vms={},
+            traces={5: _trace(10, 1, 20, 2, 99)},
+            interfaces={10: {"id": 10, "name": "eth0"}},
+        )
+        # Default roles skip firewalls
+        assert build_links(snapshot) == []
+        # Custom roles include firewalls
+        links = build_links(snapshot, target_roles=frozenset({"firewall"}))
+        assert len(links) == 1
+
 
 class TestBuildPaths:
     def test_path_from_node_to_main(self) -> None:
@@ -293,3 +314,26 @@ class TestBuildPaths:
         result = build_paths(snapshot, location_filter="dc1")
         leaf = next(p for p in result if p["instance"] == "leaf")
         assert leaf["VertexB"][-1] == "main-a"
+
+    def test_custom_main_tag(self) -> None:
+        snapshot = CacheSnapshot(
+            devices={
+                1: _device(1, "leaf1", location_slug="dc1", location_id=100),
+                2: _device(2, "spine1", location_slug="dc1", location_id=100, tags=["core-node"]),
+            },
+            locations={100: _location(100, "dc1", "30.5", "59.9")},
+            cables={},
+            vms={},
+            traces={5: _trace(10, 1, 20, 2, 99)},
+            interfaces={},
+        )
+        # Default tag "mapgl-main" does not match -> spine1 is not a main
+        default_result = build_paths(snapshot, location_filter="dc1")
+        instances = {obj["instance"]: obj for obj in default_result}
+        assert "spine1" not in instances or instances["spine1"]["edgeId"] != "-1"
+
+        # Custom tag "core-node" matches -> spine1 is a main
+        custom_result = build_paths(snapshot, location_filter="dc1", main_tag="core-node")
+        custom_instances = {obj["instance"]: obj for obj in custom_result}
+        assert "spine1" in custom_instances
+        assert custom_instances["spine1"]["edgeId"] == "-1"

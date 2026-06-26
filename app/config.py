@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass
 
@@ -15,6 +16,22 @@ def _get_int(raw: str, default: int) -> int:
         return int(raw)
     except (TypeError, ValueError):
         return default
+
+
+def _parse_json_str_list(raw: str, fallback: list[str]) -> frozenset[str]:
+    """Parse a JSON array string into a frozenset of trimmed values.
+
+    Returns the *fallback* on any parse error or empty result so the app
+    always starts with a valid, non-empty set.
+    """
+    try:
+        parsed = json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return frozenset(fallback)
+    if not isinstance(parsed, list):
+        return frozenset(fallback)
+    values = {str(item).strip() for item in parsed if str(item).strip()}
+    return frozenset(values) if values else frozenset(fallback)
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +50,10 @@ class Config:
     netbox_page_size: int
     blank_lines_between_objects: int
     log_level: str
+    main_tag: str
+    target_roles: frozenset[str]
+    lat_field: str
+    lon_field: str
 
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> Config:
@@ -67,4 +88,10 @@ class Config:
                 0, _get_int(e.get("BLANK_LINES_BETWEEN_OBJECTS", "3"), 3)
             ),
             log_level=e.get("LOG_LEVEL", "INFO").upper(),
+            main_tag=e.get("NETBOX_MAIN_TAG", "mapgl-main"),
+            target_roles=_parse_json_str_list(
+                e.get("NETBOX_TARGET_ROLES", ""), ["router", "switch"]
+            ),
+            lat_field=e.get("NETBOX_LAT_FIELD", "lat"),
+            lon_field=e.get("NETBOX_LON_FIELD", "lon"),
         )

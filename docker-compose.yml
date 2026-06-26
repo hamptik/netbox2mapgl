@@ -13,6 +13,10 @@ services:
       TRACE_CONCURRENCY: ${TRACE_CONCURRENCY:-1}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       BLANK_LINES_BETWEEN_OBJECTS: ${BLANK_LINES_BETWEEN_OBJECTS:-3}
+      NETBOX_MAIN_TAG: ${NETBOX_MAIN_TAG:-mapgl-main}
+      NETBOX_TARGET_ROLES: ${NETBOX_TARGET_ROLES:-["router","switch"]}
+      NETBOX_LAT_FIELD: ${NETBOX_LAT_FIELD:-lat}
+      NETBOX_LON_FIELD: ${NETBOX_LON_FIELD:-lon}
     volumes:
       - netbox2mapgl_data:/data
     ports:
