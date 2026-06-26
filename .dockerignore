@@ -1,0 +1,39 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Testing / linting
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+htmlcov/
+tests/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+
+# Project files not needed in image
+README.md
+docker-compose*.yml
+.env
+.env.*
+Dockerfile
+.dockerignore

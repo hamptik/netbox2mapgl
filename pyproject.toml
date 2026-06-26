@@ -1,0 +1,49 @@
+[project]
+name = "netbox2mapgl"
+version = "1.0.0"
+description = "Service that synchronizes NetBox topology into MapGL map data (links & paths)"
+requires-python = ">=3.11"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "SIM",  # flake8-simplify
+    "C4",   # flake8-comprehensions
+    "RET",  # flake8-return
+    "S",    # bandit (security)
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "S104",   # possible binding to all interfaces (intended for a server)
+    "S108",   # probable insecure usage of temp file
+    "B008",   # function call in default argument (Flask route decorators)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]   # asserts allowed in tests
+"app/db.py" = ["S608"]  # table names come from a hardcoded allow-list (TABLES), not user input
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = "-ra -q"

@@ -1,0 +1,22 @@
+services:
+  app:
+    image: ghcr.io/hamptik/netbox2mapgl:latest
+    build: .
+    container_name: netbox2mapgl-app
+    restart: unless-stopped
+    environment:
+      NETBOX_URL: ${NETBOX_URL:?NETBOX_URL is required}
+      NETBOX_TOKEN: ${NETBOX_TOKEN:?NETBOX_TOKEN is required}
+      DB_PATH: /data/netbox_cache.db
+      NETBOX_VERIFY_SSL: ${NETBOX_VERIFY_SSL:-true}
+      CACHE_INTERVAL_SEC: ${CACHE_INTERVAL_SEC:-1200}
+      TRACE_CONCURRENCY: ${TRACE_CONCURRENCY:-1}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      BLANK_LINES_BETWEEN_OBJECTS: ${BLANK_LINES_BETWEEN_OBJECTS:-3}
+    volumes:
+      - netbox2mapgl_data:/data
+    ports:
+      - "${APP_PORT:-5000}:5000"
+
+volumes:
+  netbox2mapgl_data:
