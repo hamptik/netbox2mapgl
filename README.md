@@ -5,24 +5,16 @@ for a [MapGL](https://grafana.com/) Grafana plugin map (links and paths to
 backbone nodes). It polls the NetBox API, caches the results in a local SQLite
 database, and exposes two JSON endpoints consumed by the map plugin frontend.
 
-## NetBox setup
+## Quick start
 
-This service expects specific objects and fields to be configured in NetBox
-(device roles, tags, geo custom fields, etc.). See **[NETBOX_SETUP.md](NETBOX_SETUP.md)**
-for a detailed, step-by-step guide.
+### Step 1 — Configure NetBox
 
-## Endpoints
+The service reads device roles, tags, cables, and geo custom fields from
+NetBox. See **[NETBOX_SETUP.md](NETBOX_SETUP.md)** for a detailed,
+step-by-step guide covering API tokens, device roles, the `mapgl-main` tag,
+location coordinates, cables, and virtual machines.
 
-| Method | Path       | Description                                                            |
-|--------|------------|------------------------------------------------------------------------|
-| GET    | `/links`   | Links between routers/switches + location markers                      |
-| GET    | `/paths`   | Shortest paths from each node/VM to the nearest backbone node          |
-| GET    | `/health`  | Cache status (object counts, last update time)                         |
-
-All endpoints support an optional `?location=<slug>` query parameter for
-filtering by location.
-
-## Run with Docker Compose
+### Step 2 — Deploy the service
 
 1. Copy `.env.example` to `.env` and fill in the values:
 
@@ -47,6 +39,48 @@ The application starts immediately and a background thread then refreshes the
 data from NetBox at a `CACHE_INTERVAL_SEC` interval. The SQLite file is stored
 in the `netbox2mapgl_data` volume (path `/data/netbox_cache.db` inside the
 container).
+
+### Step 3 — Set up Grafana
+
+Once the service is running, configure Grafana to visualize the topology:
+
+1. **Install the MapGL panel plugin** (`vaduga-mapgl-panel`).
+2. **Configure datasources**:
+   - [Infinity](https://grafana.com/grafana/plugins/yesoreyeram-infinity-datasource/)
+     — points to the `netbox2mapgl` service.
+   - **Prometheus** with [snmp_exporter](https://github.com/prometheus/snmp_exporter)
+     — provides interface traffic and device status metrics.
+3. **Create dashboard variables** and **import panel templates** from the
+   `panels/` folder.
+
+See **[GRAFANA_SETUP.md](GRAFANA_SETUP.md)** for the complete walkthrough.
+
+## Panel templates
+
+Ready-made panel JSON files are available in the [`panels/`](panels/) folder:
+
+| File           | Description                                                        |
+|----------------|--------------------------------------------------------------------|
+| `geomap.json`  | Geographic network map — inter-location links with traffic overlays|
+| `localmap.json`| Logical/local map — device-to-backbone paths within a location     |
+
+These templates are pre-configured with example transformations, thresholds,
+and styling. They use dashboard variables (no hardcoded IPs or datasources), so
+they work out of the box after following the [Grafana setup guide](GRAFANA_SETUP.md).
+
+You can also download them directly from the
+[`panels/` folder on GitHub](panels/).
+
+## Endpoints
+
+| Method | Path       | Description                                                            |
+|--------|------------|------------------------------------------------------------------------|
+| GET    | `/links`   | Links between routers/switches + location markers                      |
+| GET    | `/paths`   | Shortest paths from each node/VM to the nearest backbone node          |
+| GET    | `/health`  | Cache status (object counts, last update time)                         |
+
+All endpoints support an optional `?location=<slug>` query parameter for
+filtering by location.
 
 ## Build and publish the image
 
