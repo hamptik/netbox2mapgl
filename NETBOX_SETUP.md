@@ -35,10 +35,12 @@ These are matched against the device's `role` (NetBox ≥ 2.11) or the legacy
 `device_role` field. Devices with any other role (e.g. `server`, `firewall`,
 `ap`) are ignored by the link builder and will not appear as link endpoints.
 
-**Action:** ensure every device you want on the map has role `router` or
-`switch`. If you use a different role slug (e.g. `core-switch`), either rename
-the slug to `switch`/`router` or adjust `VALID_TARGET_ROLES` in
-`app/builders/utils.py`.
+The set of accepted role slugs is configurable via the `NETBOX_TARGET_ROLES`
+environment variable (a JSON array). The default is `["router","switch"]`.
+
+**Action:** ensure every device you want on the map has a role that matches
+`NETBOX_TARGET_ROLES`. If you use a different role slug (e.g. `core-switch`),
+either rename the slug to match or set `NETBOX_TARGET_ROLES` accordingly.
 
 ---
 
@@ -52,31 +54,33 @@ tag:
 mapgl-main
 ```
 
-The tag is matched by **slug**, so create a tag whose slug is exactly
-`mapgl-main`:
+The tag slug is configurable via the `NETBOX_MAIN_TAG` environment variable
+(default: `mapgl-main`).
+
+The tag is matched by **slug**, so create a tag whose slug matches the
+configured value:
 
 - **Customization → Tags → + Add**
 - Name: e.g. `MapGL Main`
-- Slug: `mapgl-main`
+- Slug: `mapgl-main` (or whatever you set in `NETBOX_MAIN_TAG`)
 
 Then apply this tag to every device that should be treated as a backbone/core
 destination. At least one tagged device must be reachable from other devices
 through cabled interfaces, otherwise no paths are produced.
-
-> If you prefer a different tag slug, change `MAIN_TAG` in
-> `app/builders/paths.py`.
 
 ---
 
 ## 4. Location custom fields `lat` and `lon`
 
 Coordinates are read from **custom fields** attached to NetBox locations. The
-service reads two custom fields:
+service reads two custom fields whose names are configurable via the
+`NETBOX_LAT_FIELD` and `NETBOX_LON_FIELD` environment variables (defaults:
+`lat` and `lon`).
 
-| Custom field | Stores     |
-|--------------|------------|
-| `lat`        | Latitude   |
-| `lon`        | Longitude  |
+| Custom field | Env var           | Default | Stores     |
+|--------------|-------------------|---------|------------|
+| `lat`        | `NETBOX_LAT_FIELD`| `lat`   | Latitude   |
+| `lon`        | `NETBOX_LON_FIELD`| `lon`   | Longitude  |
 
 **Action:**
 
@@ -84,10 +88,10 @@ service reads two custom fields:
 2. Create a custom field with:
    - Type: **Decimal** (or Text)
    - Object type: **DCIM > Location** (apply to locations)
-   - Name: `lat`
-3. Repeat for `lon`.
+   - Name: `lat` (or whatever you set in `NETBOX_LAT_FIELD`)
+3. Repeat for `lon` (or `NETBOX_LON_FIELD`).
 4. For every location that should appear on the map, fill in the latitude in
-   `lat` and the longitude in `lon`.
+   the lat field and the longitude in the lon field.
 
 Locations without both coordinates (or with `0`) are **skipped** — no markers
 and no links are emitted for them.
@@ -188,9 +192,9 @@ so a server-side `MAX_PAGE_SIZE` cap will not truncate the result set.
 
 - [ ] Read-only API token created (`NETBOX_TOKEN`).
 - [ ] `NETBOX_URL` points to the NetBox instance.
-- [ ] Target devices have role slug `router` or `switch`.
-- [ ] Backbone devices tagged with `mapgl-main`.
-- [ ] Locations have `lat` (latitude) and `lon` (longitude) filled.
+- [ ] Target devices have a role slug listed in `NETBOX_TARGET_ROLES` (default: `router`, `switch`).
+- [ ] Backbone devices tagged with `NETBOX_MAIN_TAG` (default: `mapgl-main`).
+- [ ] Locations have `NETBOX_LAT_FIELD` (latitude, default: `lat`) and `NETBOX_LON_FIELD` (longitude, default: `lon`) filled.
 - [ ] Devices assigned to a geo-tagged location.
 - [ ] Cables connect interfaces between devices.
 - [ ] (Optional) Virtual machines assigned to clusters of cabled devices.

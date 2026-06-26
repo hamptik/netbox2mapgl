@@ -76,3 +76,41 @@ def test_page_size_clamped_to_minimum() -> None:
     assert Config.from_env(env).netbox_page_size == 1
     env = dict(_VALID, NETBOX_PAGE_SIZE="-5")
     assert Config.from_env(env).netbox_page_size == 1
+
+
+class TestDomainDefaults:
+    def test_main_tag_default(self) -> None:
+        assert Config.from_env(_VALID).main_tag == "mapgl-main"
+
+    def test_main_tag_override(self) -> None:
+        env = dict(_VALID, NETBOX_MAIN_TAG="custom-main")
+        assert Config.from_env(env).main_tag == "custom-main"
+
+    def test_target_roles_default(self) -> None:
+        assert Config.from_env(_VALID).target_roles == frozenset({"router", "switch"})
+
+    def test_target_roles_override(self) -> None:
+        env = dict(_VALID, NETBOX_TARGET_ROLES='["router","firewall"]')
+        assert Config.from_env(env).target_roles == frozenset({"router", "firewall"})
+
+    def test_target_roles_invalid_json_falls_back(self) -> None:
+        env = dict(_VALID, NETBOX_TARGET_ROLES="not-json")
+        assert Config.from_env(env).target_roles == frozenset({"router", "switch"})
+
+    def test_target_roles_empty_list_falls_back(self) -> None:
+        env = dict(_VALID, NETBOX_TARGET_ROLES="[]")
+        assert Config.from_env(env).target_roles == frozenset({"router", "switch"})
+
+    def test_lat_field_default(self) -> None:
+        assert Config.from_env(_VALID).lat_field == "lat"
+
+    def test_lat_field_override(self) -> None:
+        env = dict(_VALID, NETBOX_LAT_FIELD="latitude")
+        assert Config.from_env(env).lat_field == "latitude"
+
+    def test_lon_field_default(self) -> None:
+        assert Config.from_env(_VALID).lon_field == "lon"
+
+    def test_lon_field_override(self) -> None:
+        env = dict(_VALID, NETBOX_LON_FIELD="longitude")
+        assert Config.from_env(env).lon_field == "longitude"

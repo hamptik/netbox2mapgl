@@ -8,8 +8,6 @@ from typing import Any
 from app.builders.utils import get_location_slug, rack_namespace
 from app.cache import CacheSnapshot
 
-MAIN_TAG = "mapgl-main"
-
 
 def _trace_endpoints(
     trace: list[Any],
@@ -33,7 +31,10 @@ def _trace_endpoints(
 
 
 def build_paths(
-    snapshot: CacheSnapshot, location_filter: str | None = None
+    snapshot: CacheSnapshot,
+    location_filter: str | None = None,
+    *,
+    main_tag: str = "mapgl-main",
 ) -> list[dict[str, Any]]:
     """Produce path records describing how each device/VM reaches a main node."""
     devices = snapshot.devices
@@ -82,7 +83,7 @@ def build_paths(
         edge_meta[(name_a, name_b)] = edge_id
         edge_meta[(name_b, name_a)] = edge_id
 
-    mains = {name for name, tags in vertex_tags.items() if MAIN_TAG in tags}
+    mains = {name for name, tags in vertex_tags.items() if main_tag in tags}
     device_path = _shortest_path_to_main(adj, mains)
 
     if location_filter:

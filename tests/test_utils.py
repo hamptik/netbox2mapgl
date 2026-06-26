@@ -45,6 +45,10 @@ class TestExtractGeo:
         loc = {"custom_fields": {"lat": "abc", "lon": "59.9"}}
         assert extract_geo(loc) == (0.0, 0.0)
 
+    def test_custom_field_names(self) -> None:
+        loc = {"custom_fields": {"latitude": "59.9", "longitude": "30.5"}}
+        assert extract_geo(loc, lat_field="latitude", lon_field="longitude") == (30.5, 59.9)
+
 
 class TestRackNamespace:
     def test_no_rack(self) -> None:

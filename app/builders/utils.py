@@ -5,9 +5,6 @@ from __future__ import annotations
 import re
 from typing import Any
 
-#: Device roles that are physical infrastructure we trace links through.
-VALID_TARGET_ROLES = frozenset({"router", "switch"})
-
 _SPEED_RE = re.compile(r"(\d+(?:\.\d+)?)(g|m)?base")
 
 
@@ -53,16 +50,19 @@ def parse_speed_bps(if_name: str | None, cable_type: str = "") -> int:
     return int(value * 10**6)
 
 
-def extract_geo(location: dict[str, Any]) -> tuple[float, float]:
+def extract_geo(
+    location: dict[str, Any], lat_field: str = "lat", lon_field: str = "lon"
+) -> tuple[float, float]:
     """Return ``(lon, lat)`` for a NetBox location.
 
-    Latitude is read from the ``lat`` custom field and longitude from ``lon``.
-    ``(0.0, 0.0)`` is returned when the location has no coordinates.
+    Latitude is read from the ``lat_field`` custom field and longitude from
+    ``lon_field``.  ``(0.0, 0.0)`` is returned when the location has no
+    coordinates.
     """
     cf = location.get("custom_fields") or {}
     try:
-        lat = float(cf.get("lat") or 0)
-        lon = float(cf.get("lon") or 0)
+        lat = float(cf.get(lat_field) or 0)
+        lon = float(cf.get(lon_field) or 0)
     except (TypeError, ValueError):
         return 0.0, 0.0
     return lon, lat

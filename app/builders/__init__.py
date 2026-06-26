@@ -33,15 +33,32 @@ def format_paths_json(objects: list[dict[str, Any]], blank_lines: int) -> str:
     return "\n".join(lines)
 
 
-def build_all(snapshot: CacheSnapshot, blank_lines: int) -> BuiltResult:
+def build_all(
+    snapshot: CacheSnapshot,
+    blank_lines: int,
+    *,
+    main_tag: str = "mapgl-main",
+    target_roles: frozenset[str] = frozenset({"router", "switch"}),
+    lat_field: str = "lat",
+    lon_field: str = "lon",
+) -> BuiltResult:
     """Build all API responses from a snapshot and pre-serialize the JSON.
 
     Paths are built **per-location** so the BFS graph is isolated within each
     location.  This prevents devices from routing through — or reaching — main
     nodes in other locations.
     """
-    links = build_links(snapshot)
-    markers = build_location_markers(snapshot)
+    links = build_links(
+        snapshot,
+        target_roles=target_roles,
+        lat_field=lat_field,
+        lon_field=lon_field,
+    )
+    markers = build_location_markers(
+        snapshot,
+        lat_field=lat_field,
+        lon_field=lon_field,
+    )
 
     location_slugs = sorted(
         {
@@ -53,7 +70,7 @@ def build_all(snapshot: CacheSnapshot, blank_lines: int) -> BuiltResult:
     )
     paths: list[dict[str, Any]] = []
     for slug in location_slugs:
-        paths.extend(build_paths(snapshot, location_filter=slug))
+        paths.extend(build_paths(snapshot, location_filter=slug, main_tag=main_tag))
 
     links_json = json.dumps(links + markers, ensure_ascii=False, indent=4)
     paths_json = format_paths_json(paths, blank_lines)

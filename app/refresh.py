@@ -95,7 +95,15 @@ class CacheRefresher(threading.Thread):
 
     def _build(self) -> None:
         snapshot = self._db.load_snapshot()
-        result = build_all(snapshot, self._blank_lines)
+        cfg = self._config
+        result = build_all(
+            snapshot,
+            self._blank_lines,
+            main_tag=cfg.main_tag,
+            target_roles=cfg.target_roles,
+            lat_field=cfg.lat_field,
+            lon_field=cfg.lon_field,
+        )
         self._store.update(result)
         log.info(
             "Build complete: %d links, %d paths",

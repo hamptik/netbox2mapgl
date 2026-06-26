@@ -67,13 +67,13 @@ def _wire_persistence(app: Flask, config: Config) -> None:
     app.config["RESPONSE_STORE"] = store
     app.config["REFRESHER"] = refresher
 
-    _startup_build(database, store, config.blank_lines_between_objects)
+    _startup_build(database, store, config)
 
     refresher.start()
     log.info("Cache refresher started (interval=%ss)", config.cache_interval_sec)
 
 
-def _startup_build(database: Database, store: ResponseStore, blank_lines: int) -> None:
+def _startup_build(database: Database, store: ResponseStore, config: Config) -> None:
     """Build API responses from existing DB data so they are ready on restart.
 
     On a fresh start (empty database) the build is skipped and the API returns
@@ -84,7 +84,14 @@ def _startup_build(database: Database, store: ResponseStore, blank_lines: int) -
         if not snapshot.devices and not snapshot.locations:
             log.info("Database empty, skipping startup build")
             return
-        result = build_all(snapshot, blank_lines)
+        result = build_all(
+            snapshot,
+            config.blank_lines_between_objects,
+            main_tag=config.main_tag,
+            target_roles=config.target_roles,
+            lat_field=config.lat_field,
+            lon_field=config.lon_field,
+        )
         store.update(result)
         log.info("Startup build from DB complete")
     except Exception:

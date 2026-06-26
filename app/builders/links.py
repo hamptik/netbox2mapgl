@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from app.builders.utils import (
-    VALID_TARGET_ROLES,
     extract_geo,
     get_location_slug,
     get_role_slug,
@@ -13,9 +12,16 @@ from app.builders.utils import (
 )
 from app.cache import CacheSnapshot
 
+_DEFAULT_TARGET_ROLES: frozenset[str] = frozenset({"router", "switch"})
+
 
 def build_links(
-    snapshot: CacheSnapshot, location_filter: str | None = None
+    snapshot: CacheSnapshot,
+    location_filter: str | None = None,
+    *,
+    target_roles: frozenset[str] = _DEFAULT_TARGET_ROLES,
+    lat_field: str = "lat",
+    lon_field: str = "lon",
 ) -> list[dict[str, Any]]:
     """Produce link records connecting routers/switches across locations.
 
@@ -54,7 +60,7 @@ def build_links(
 
         role_a = get_role_slug(dev_a)
         role_b = get_role_slug(dev_b)
-        if role_a not in VALID_TARGET_ROLES or role_b not in VALID_TARGET_ROLES:
+        if role_a not in target_roles or role_b not in target_roles:
             continue
 
         loc_slug_a = get_location_slug(dev_a)
@@ -83,7 +89,7 @@ def build_links(
         loc_obj = locations.get(loc_id)
         if not isinstance(loc_obj, dict):
             continue
-        lon, lat = extract_geo(loc_obj)
+        lon, lat = extract_geo(loc_obj, lat_field, lon_field)
         if lon == 0.0 or lat == 0.0:
             continue
 
@@ -106,7 +112,11 @@ def build_links(
 
 
 def build_location_markers(
-    snapshot: CacheSnapshot, location_filter: str | None = None
+    snapshot: CacheSnapshot,
+    location_filter: str | None = None,
+    *,
+    lat_field: str = "lat",
+    lon_field: str = "lon",
 ) -> list[dict[str, Any]]:
     """Produce one coordinate marker per geo-tagged location."""
     markers: list[dict[str, Any]] = []
@@ -114,7 +124,7 @@ def build_location_markers(
         slug = loc.get("slug")
         if location_filter and slug != location_filter:
             continue
-        lon, lat = extract_geo(loc)
+        lon, lat = extract_geo(loc, lat_field, lon_field)
         if lon == 0.0 or lat == 0.0:
             continue
         markers.append(
